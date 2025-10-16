@@ -6,42 +6,60 @@ using System.Linq;
 public class CrossWordBuilder : MonoBehaviour
 {
     List<string> words = new List<string> { "karayip", "kriket", "gül", "test", "astana", "kalabalýk", "biber", "gri", "kesik", "altýn" };
-    public TextMeshProUGUI longWord;
-    public TextMeshProUGUI targetWord;
     List<string> targetWords = new List<string>();
     char[] targetLetters;
+    public CrossWordGrid grid;
+    private int startX = 2;
+    private int startY = 7;
+
+
     private void Start()
-    { 
+    {
+        BuildCrossWord(); 
+    }
+
+    void BuildCrossWord()
+    {
         string longestWord = words[0];
-        
+
         for (int i = 0; i < words.Count; i++)
         {
             if (words[i].Length > longestWord.Length)
 
                 longestWord = words[i];
-                longWord.text = longestWord;
-                targetLetters = longestWord.ToCharArray();
 
         }
+        targetLetters = longestWord.ToCharArray();
+
+        for (int i = 0; i < longestWord.Length; i++)
+        {
+            grid.SetLetter(startX + i, startY, longestWord[i]);
+        }
+
         words.Remove(longestWord);
 
-        foreach(var word in words)
+        foreach (var word in words)
         {
             bool hasLetter = false;
-            foreach(var letter in word) {
-                if (targetLetters.Contains(letter)){
+            foreach (var letter in word)
+            {
+                if (targetLetters.Contains(letter))
+                {
                     hasLetter = true;
                     break;
                 }
 
             }
             if (hasLetter)
+            {
                 targetWords.Add(word);
+                Debug.Log(word);
+            }
+                
         }
-        int randomIndex = Random.Range(0, targetWords.Count);
-        string nextWord = targetWords[randomIndex];
-        targetWord.text = nextWord;
-
+       // int randomIndex = Random.Range(0, targetWords.Count);
+        // string nextWord = targetWords[randomIndex];
+ 
     }
 
 }
