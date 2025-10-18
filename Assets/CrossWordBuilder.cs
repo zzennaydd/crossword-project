@@ -12,10 +12,12 @@ public class CrossWordBuilder : MonoBehaviour
     private int startX = 2;
     private int startY = 7;
 
-
+    private int maxWords = 5;
+    private int wordCount = 0;
+    bool placedWord = false;
     private void Start()
     {
-        BuildCrossWord(); 
+        BuildCrossWord();
     }
 
     void BuildCrossWord()
@@ -38,29 +40,64 @@ public class CrossWordBuilder : MonoBehaviour
 
         words.Remove(longestWord);
 
-        foreach (var word in words)
+        wordCount = 1;
+        while (wordCount < maxWords && words.Count > 0)
         {
-            bool hasLetter = false;
-            foreach (var letter in word)
+            int randomIndex = Random.Range(0, words.Count);
+            string word = words[randomIndex];
+            words.RemoveAt(randomIndex);
+
+            PlaceWord(word);
+            if (placedWord)
+                wordCount++;
+        }
+
+        void PlaceWord(string word) //inprogress
+        {
+            foreach (char letter in word)
             {
-                if (targetLetters.Contains(letter))
+                for (int y = 0; y < grid.height; y++)
                 {
-                    hasLetter = true;
-                    break;
+                    for (int x = 0; x < grid.width; x++)
+                    {
+                        if (grid.GetLetter(x, y) == letter)
+                        {
+                            int targetIndex = word.IndexOf(letter);
+                            int startYPosition = y - targetIndex;
+
+                            if (startYPosition >= 0 && startYPosition + word.Length <= grid.height)
+                            {
+                                bool canPlace = true;
+
+                                for (int i = 0; i < word.Length; i++)
+                                {
+                                    char existing = grid.GetLetter(x, startYPosition + i);
+                                    if (existing != '\0' && existing != word[i])
+                                    {
+                                        canPlace = false;
+                                        break;
+                                    }
+                                }
+
+                                if (canPlace)
+                                {
+                                    for (int i = 0; i < word.Length; i++)
+                                    {
+                                        grid.SetLetter(x, startYPosition + i, word[i]);
+                                        placedWord = true;
+                                    }
+                                    return; 
+                                }
+                            }
+                        }
+                    }
                 }
 
             }
-            if (hasLetter)
-            {
-                targetWords.Add(word);
-                Debug.Log(word);
-            }
-                
         }
-       // int randomIndex = Random.Range(0, targetWords.Count);
-        // string nextWord = targetWords[randomIndex];
- 
-    }
 
+    }
 }
+
+
 

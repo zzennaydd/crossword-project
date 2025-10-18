@@ -6,8 +6,8 @@ using TMPro;
 public class CrossWordGrid : MonoBehaviour
 {
     [Header("Grid Settings")]
-    int width = 15;
-    int height = 15;
+    public int width = 15;
+    public int height = 15;
     public GameObject cellPrefab;
     public GameObject gridParent;
 
@@ -21,9 +21,9 @@ public class CrossWordGrid : MonoBehaviour
     }
     void CreateGrid()
     {
-        for(int x = 0; x < width; x++)
+        for(int y = 0; y < height; y++)
         {
-            for(int y = 0; y < height; y++)
+            for(int x = 0; x < width; x++)
             {
                 GameObject cell = Instantiate(cellPrefab, gridParent.transform);
             }
@@ -48,11 +48,25 @@ public class CrossWordGrid : MonoBehaviour
         cell.text = letter.ToString();
     }
 
+    public char GetLetter(int x, int y)
+    {
+        return crosswordGrid[y, x];
+    }
+
+
     public void ClearGrid()
     {
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width; x++)
+            {
+                crosswordGrid[y, x] = '\0'; //veri temizligi
+            }
+        }
         for (int i = 0; i < gridParent.transform.childCount; i++)
         {
-            gridParent.transform.GetChild(i).GetComponentInChildren<TextMeshProUGUI>().text = "";
+            gridParent.transform.GetChild(i).GetComponentInChildren<TextMeshProUGUI>().text = ""; //görsel temizlik
         }
     }
 }
