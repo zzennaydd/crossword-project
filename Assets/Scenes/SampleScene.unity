@@ -492,6 +492,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a12ece98c58bb8449ea121ca3e64add, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  width: 30
+  height: 30
   cellPrefab: {fileID: 7140075774023209133, guid: 1fac36e8c9c991a4597abc9375d4b0aa, type: 3}
   gridParent: {fileID: 34750080}
 --- !u!4 &1569188857
