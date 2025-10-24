@@ -6,8 +6,8 @@ using TMPro;
 public class CrossWordGrid : MonoBehaviour
 {
     [Header("Grid Settings")]
-    public int width = 50;
-    public int height = 50;
+    public int width = 30;
+    public int height = 30;
     public GameObject cellPrefab;
     public GameObject gridParent;
 

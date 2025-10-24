@@ -15,7 +15,6 @@ public class CrossWordBuilder : MonoBehaviour
     {
         BuildCrossWord();
     }
-
     void BuildCrossWord()
     {
         string longestWord = words[0];
@@ -61,8 +60,8 @@ public class CrossWordBuilder : MonoBehaviour
                         {
                             int targetIndex = word.IndexOf(letter);
 
-                            TryPlaceWord(word, x, y, targetIndex, vertical: true,hasInteraction:true); //dikey olarak dene
-                            TryPlaceWord(word, x, y, targetIndex, vertical: false,hasInteraction:true); //yatay olarak dene
+                            TryPlaceWord(word, x, y, targetIndex, vertical: true,hasInteraction:true); 
+                            TryPlaceWord(word, x, y, targetIndex, vertical: false,hasInteraction:true);
 
                             if (placedWord)
                                 return;
@@ -95,6 +94,16 @@ public class CrossWordBuilder : MonoBehaviour
             bool canPlace = true;
             bool hasIntersection = false;
 
+            if (vertical)
+            {
+                if (startY > 0 && grid.GetLetter(x, startY - 1) != '\0')
+                    return;
+            }
+            else
+            {
+                if (startX > 0 && grid.GetLetter(startX - 1, y) != '\0')
+                    return;
+            }
 
             for (int i = 0; i < word.Length; i++)
             {
@@ -102,22 +111,45 @@ public class CrossWordBuilder : MonoBehaviour
                 int checkY = startY + (vertical ? i : 0);
                 char existing = grid.GetLetter(checkX, checkY);
 
-                if (existing != '\0')
+                if (existing != '\0' && existing != word[i])
                 {
-
-                    if (existing == word[i])
-                    {
-                        hasIntersection = true;
-                    }
-                    else
-                    {
-                        canPlace = false;
-                        break;
-                    }
+                    canPlace = false;
+                    break;
                 }
-                
+
+                if (existing == word[i])
+                {
+                    hasIntersection = true;
+                    continue;
+                }
+
+                if (vertical)
+                {
+                    if (checkX > 0 && grid.GetLetter(checkX - 1, checkY) != '\0') { canPlace = false; break; }
+                    if (checkX < grid.width - 1 && grid.GetLetter(checkX + 1, checkY) != '\0') { canPlace = false; break; }
+                }
+                else
+                { 
+                    if (checkY > 0 && grid.GetLetter(checkX, checkY - 1) != '\0') { canPlace = false; break; }
+                    if (checkY < grid.height - 1 && grid.GetLetter(checkX, checkY + 1) != '\0') { canPlace = false; break; }
+                }
             }
-                if (canPlace && hasIntersection)
+
+            if (canPlace)
+            {
+                if (vertical)
+                {
+                    if (startY + word.Length < grid.height && grid.GetLetter(x, startY + word.Length) != '\0')
+                        canPlace = false;
+                }
+                else
+                {
+                    if (startX + word.Length < grid.width && grid.GetLetter(startX + word.Length, y) != '\0')
+                        canPlace = false;
+                }
+            }
+
+            if (canPlace && hasIntersection)
                 {
                     for (int i = 0; i < word.Length; i++)
                     {
