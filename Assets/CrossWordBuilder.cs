@@ -5,21 +5,29 @@ using TMPro;
 using System.Linq;
 public class CrossWordBuilder : MonoBehaviour
 {
-    List<string> words = new List<string> { "shops", "greeds", "simplify", "game", "puffed", "fig","cosmic","magic","dimension","infect","victim","foreign","supernatural", "kills", "paws", "leopar","freezing","renting","thriller","halloween","ballet", "scene","cake","fines","police","earth","chessboard"};
+    public List<string> words = new List<string> { "shops", "greeds", "simplify", "game", "puffed", "fig","cosmic","magic","dimension","infect","victim","foreign","supernatural", "kills", "paws", "leopar","freezing","renting","thriller","halloween","ballet", "scene","fines","police","earth","chessboard"};
     public CrossWordGrid grid;
     private int startX = 2;
     private int startY = 7;
 
+    public int maxWords = 5;
     bool placedWord = false;
     private void Start()
     {
         BuildCrossWord();
     }
-    void BuildCrossWord()
+    public void BuildCrossWord()
     {
+
+        if (words == null || words.Count == 0)
+        {
+            Debug.LogWarning("No words to build crossword!");
+            return;
+        }
+
         string longestWord = words[0];
 
-        for (int i = 0; i < words.Count; i++)
+        for (int i = 1; i < words.Count; i++)
         {
             if (words[i].Length > longestWord.Length)
 
@@ -35,7 +43,7 @@ public class CrossWordBuilder : MonoBehaviour
         words.Remove(longestWord);
 
         int wordCount = 1;
-        while ( words.Count > 0)
+        while (maxWords>0 && words.Count >0)
         {
             int randomIndex = Random.Range(0, words.Count);
             string word = words[randomIndex];
@@ -44,8 +52,11 @@ public class CrossWordBuilder : MonoBehaviour
             PlaceWord(word);
 
             if (placedWord)
+            {
+                maxWords--;
                 wordCount++;
                 words.RemoveAt(randomIndex);
+            }
         }
 
         void PlaceWord(string word)
