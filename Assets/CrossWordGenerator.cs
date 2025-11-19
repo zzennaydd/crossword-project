@@ -7,7 +7,7 @@ public class CrossWordGenerator : MonoBehaviour
     public CrossWordGrid grid;
     public int iterations = 5;
     public int maxWords;
-    public List<string> words;
+    [HideInInspector]
     public CrossWordBuilder builder;
     void Start()
     {
@@ -32,7 +32,6 @@ public class CrossWordGenerator : MonoBehaviour
 
             builder.grid = grid;
             builder.maxWords = maxWords;
-            builder.words = new List<string>(words);
             builder.BuildCrossWord();
 
             float score = GenerateScore(grid);

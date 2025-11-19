@@ -1,20 +1,119 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System.Linq;
+
 public class CrossWordBuilder : MonoBehaviour
 {
-    public List<string> words = new List<string> { "shops", "greeds", "simplify", "game", "puffed", "fig","cosmic","magic","dimension","infect","victim","foreign","supernatural", "kills", "paws", "leopar","freezing","renting","thriller","halloween","ballet", "scene","fines","police","earth","chessboard"};
+    [HideInInspector]
+    public List<string> words = new List<string>();
+    // public List<string> words = new List<string> { "shops", "greeds", "simplify", "game", "puffed", "fig","cosmic","magic","dimension","infect","victim","foreign","supernatural", "kills", "paws", "leopar","freezing","renting","thriller","halloween","ballet", "scene","fines","police","earth","chessboard"};
     public CrossWordGrid grid;
     private int startX = 2;
     private int startY = 7;
 
-    public int maxWords = 5;
+    public int maxWords = 7;
     bool placedWord = false;
+    public List<Questions> quelist = new List<Questions>();
+
+    public string csvFileName = "tdk_word_meaning_data";
     private void Start()
     {
+        LoadCSV();
+
+        List<Questions> selected = GetRandomQuestions(7);
+
+        Debug.Log("---- SEÇİLEN 7 KELİME ----");
+
+        foreach (var q in selected)
+        {
+            Debug.Log(q.word + " : " + q.meaning);
+        }
+        words = selected.Select(q => q.word).ToList();
+
         BuildCrossWord();
+    }
+
+    public List<Questions> GetRandomQuestions(int count)
+    {
+        if (quelist.Count < count)
+            count = quelist.Count; 
+
+        List<Questions> copy = new List<Questions>(quelist);
+        List<Questions> result = new List<Questions>();
+
+        for (int i = 0; i < count; i++)
+        {
+            int index = Random.Range(0, copy.Count);
+            result.Add(copy[index]);
+            copy.RemoveAt(index);
+        }
+
+        return result;
+    }
+    public void LoadCSV()
+    {
+        TextAsset csvFile = Resources.Load<TextAsset>(csvFileName);
+
+        if (csvFile == null)
+        {
+            Debug.LogError("CSV file not found: " + csvFileName);
+            return;
+        }
+
+        string[] rows = csvFile.text.Split('\n');
+
+        for (int i = 1; i < rows.Length; i++) 
+        {
+            string row = rows[i].Trim();
+            if (string.IsNullOrWhiteSpace(row))
+                continue;
+
+            ParseRow(row, out string word, out string meaning);
+
+            if (!word.Contains(" ") && !meaning.Contains(" "))
+            {
+                quelist.Add(new Questions(word, meaning));
+            }
+        }
+
+        Debug.Log("Loaded words: " + quelist.Count);
+    }
+
+    public static void ParseRow(string row, out string word, out string meaning)
+    {
+        int firstComma = -1;
+        bool insideQuotes = false;
+
+        for (int i = 0; i < row.Length; i++)
+        {
+            if (row[i] == '"')
+            {
+                insideQuotes = !insideQuotes;
+                continue;
+            }
+
+            if (row[i] == ',' && !insideQuotes)
+            {
+                firstComma = i;
+                break;
+            }
+        }
+
+        if (firstComma == -1)
+        {
+            word = row.Trim();
+            meaning = "";
+            return;
+        }
+
+        word = row.Substring(0, firstComma).Trim();
+        meaning = row.Substring(firstComma + 1).Trim();
+
+       
+        if (meaning.StartsWith("\"") && meaning.EndsWith("\""))
+            meaning = meaning.Substring(1, meaning.Length - 2);
     }
     public void BuildCrossWord()
     {
